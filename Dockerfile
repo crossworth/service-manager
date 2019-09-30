@@ -11,6 +11,8 @@ RUN cd /app && go build -o service-manager cmd/servicemanager/main.go
 
 FROM alpine:latest
 
+RUN apk add --no-cache ca-certificates
+
 COPY --from=build /app/service-manager /home/service-manager
 
 RUN chmod +x /home/service-manager
