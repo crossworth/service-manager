@@ -61,12 +61,13 @@ func registerHandler(register registerable) http.HandlerFunc {
 		service.Value = values.Get("value")
 
 		if service.Name == "" {
-			writeJson(w, newHTTPResponseError(errors.New("service name not provided")), 400)
+			writeJson(w, newHTTPResponseError(errors.New("service not provided")), 400)
 			return
 		}
 
 		if service.Endpoint == "" {
-			service.Endpoint = getRealIP(r)
+			writeJson(w, newHTTPResponseError(errors.New("endpoint not provided")), 400)
+			return
 		}
 
 		register.RegisterService(service)
@@ -75,8 +76,8 @@ func registerHandler(register registerable) http.HandlerFunc {
 	}
 }
 
-func servicesHandler(services []ServiceInfo) http.HandlerFunc {
+func servicesHandler(servicesFunc func() []ServiceInfo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		writeJson(w, services, 200)
+		writeJson(w, servicesFunc(), 200)
 	}
 }

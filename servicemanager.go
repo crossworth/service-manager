@@ -78,7 +78,9 @@ func (s *Server) SetHttpClient(client *http.Client) {
 // GetServices returns all the registered services
 func (s *Server) GetServices() []ServiceInfo {
 	items := s.services.Items()
-	var r []ServiceInfo
+
+	r := make([]ServiceInfo, 0)
+
 	for _, e := range items {
 		r = append(r, e.Object.(ServiceInfo))
 	}
@@ -106,7 +108,7 @@ func (s *Server) setHttpHandlers() {
 	)
 	s.Handle("/", homeHandler())
 	s.Handle("/register", registerHandler(s))
-	s.Handle("/services", servicesHandler(s.GetServices()))
+	s.Handle("/services", servicesHandler(s.GetServices))
 }
 
 func (s *Server) checkForServiceChanges() {
