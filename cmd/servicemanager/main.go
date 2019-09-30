@@ -18,6 +18,7 @@ func main() {
 
 	webhook := os.Getenv("CHANGES_WEBHOOK")
 	var webhookUrls []string
+
 	if webhook != "" {
 		webhookUrls = strings.Split(webhook, ",")
 	}
@@ -34,6 +35,7 @@ func main() {
 		Handler:      sm,
 	}
 
+	log.Printf("starting service on port %q\n", port)
 	err = s.ListenAndServe()
 	if err != nil {
 		log.Fatalf("error listing on port %q %s\n", port, err)

@@ -86,7 +86,11 @@ func TestServicesHandler(t *testing.T) {
 		},
 	}
 
-	servicesHandler(services).ServeHTTP(w, r)
+	servicesFun := func() []ServiceInfo {
+		return services
+	}
+
+	servicesHandler(servicesFun).ServeHTTP(w, r)
 
 	data, err := json.Marshal(&services)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/patrickmn/go-cache"
+	"log"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -57,15 +58,19 @@ func New(timeToLive time.Duration, webhookUrls []string) (*Server, error) {
 			return &Server{}, fmt.Errorf("invalid webhook url %q", err)
 		}
 
+		log.Printf("webhook url added %q\n", u.String())
 		s.webhookUrls = append(s.webhookUrls, u)
 	}
 
 	if len(s.webhookUrls) > 0 {
 		_, err := scheduler.Every(int(timeToLive.Seconds())).Seconds().Run(s.checkForServiceChanges)
-		return s, err
+		if err != nil {
+			return s, err
+		}
 	}
 
 	s.setHttpHandlers()
+
 	return s, nil
 }
 
