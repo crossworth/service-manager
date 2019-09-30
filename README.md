@@ -48,10 +48,16 @@ func init() {
 	if os.Getenv("SERVICE_MANAGER") != "" {
 		log.Println("ServiceManager notifications enable")
 
+		localIp, err := client.GetLocalIP()
+		if err != nil {
+			log.Fatal("could not determine local ip", err)
+		}
+
+
 		var opts client.Options
 		opts.Name = service
 		opts.ManagerEndpoint = os.Getenv("SERVICE_MANAGER")
-		opts.Endpoint = client.GetLocalIP() + ":8080"
+		opts.Endpoint = localIp + ":8080"
 		opts.Value = func() string {
 			return "my-value"
 		}
