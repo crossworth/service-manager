@@ -3,8 +3,8 @@ package servicemanager
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 type httpResponseError struct {
@@ -57,8 +57,12 @@ func registerHandler(register registerable) http.HandlerFunc {
 
 		service.Name = values.Get("service")
 		service.Endpoint = values.Get("endpoint")
-		service.HealthCheckTime = time.Now().Unix()
 		service.Value = values.Get("value")
+
+		if service.Value == "" {
+			bodyBytes, _ := ioutil.ReadAll(r.Body)
+			service.Value = string(bodyBytes)
+		}
 
 		if service.Name == "" {
 			writeJson(w, newHTTPResponseError(errors.New("service not provided")), 400)

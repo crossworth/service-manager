@@ -13,7 +13,7 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
-		log.Printf("using default http port %q\n", port)
+		log.Println("using default port")
 	}
 
 	webhook := os.Getenv("CHANGES_WEBHOOK")

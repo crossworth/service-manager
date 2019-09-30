@@ -109,7 +109,7 @@ func checkServiceManager(httpClient *http.Client, managerEndpoint string) error 
 func notifyServiceManager(options Options) {
 	url := options.ManagerEndpoint + "/register?service=" + options.Name + "&endpoint=" + options.Endpoint
 
-	response, err := options.HttpClient.Post(url, "application/json", bytes.NewReader([]byte(options.Value())))
+	response, err := options.HttpClient.Post(url, "application/json", bytes.NewBuffer([]byte(options.Value())))
 	if err != nil {
 		options.Logger.Printf("notifyServiceManager: error netClient.Post %s\n", err)
 		return

@@ -18,10 +18,9 @@ const ServiceName = "service-manager"
 
 // ServiceInfo is the representation of a registered service
 type ServiceInfo struct {
-	Name            string      `json:"name"`
-	Endpoint        string      `json:"endpoint"`
-	HealthCheckTime int64       `json:"health_check_time"`
-	Value           interface{} `json:"value,omitempty"`
+	Name     string      `json:"name"`
+	Endpoint string      `json:"endpoint"`
+	Value    interface{} `json:"value,omitempty"`
 }
 
 // Server is main application struct
@@ -127,8 +126,15 @@ func (s *Server) checkForServiceChanges() {
 	}
 
 	if hasChanges && len(s.webhookUrls) > 0 {
-		// https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F
-		go s.notifyChanges(append(oldServices[:0:0], oldServices...), append(newServices[:0:0], newServices...))
+		// we use this to copy the slices
+		empty := make([]ServiceInfo, 0)
+		go notifyChanges(
+			s.webhookUrls,
+			s.maxWebhookTries,
+			s.httpClient,
+			append(empty, oldServices...),
+			append(empty, newServices...),
+		)
 	}
 
 	s.servicesLastCheck = newServices

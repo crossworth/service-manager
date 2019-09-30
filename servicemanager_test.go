@@ -47,10 +47,9 @@ func TestServer_RegisterService(t *testing.T) {
 	assert.Equal(t, len(s.GetServices()), 0, "Returns 0 services")
 
 	s.RegisterService(ServiceInfo{
-		Name:            "test-service",
-		Endpoint:        "http://test-service:9000",
-		HealthCheckTime: time.Now().Unix(),
-		Value:           nil,
+		Name:     "test-service",
+		Endpoint: "http://test-service:9000",
+		Value:    nil,
 	})
 
 	assert.Equal(t, len(s.GetServices()), 1, "Returns 1 services")

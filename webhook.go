@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"log"
+	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -13,7 +15,7 @@ type webhookInfo struct {
 	Time int64         `json:"time"`
 }
 
-func (s *Server) notifyChanges(old []ServiceInfo, new []ServiceInfo) {
+func notifyChanges(webhookUrls []*url.URL, maxWebhookTries int, httpClient *http.Client, old []ServiceInfo, new []ServiceInfo) {
 	data := webhookInfo{
 		Old:  old,
 		New:  new,
@@ -25,17 +27,17 @@ func (s *Server) notifyChanges(old []ServiceInfo, new []ServiceInfo) {
 		return
 	}
 
-	reader := bytes.NewReader(buffer)
-
-	for _, u := range s.webhookUrls {
-		for i := 0; i <= s.maxWebhookTries; i++ {
-			resp, err := s.httpClient.Post(u.String(), "application/json", reader)
+	for _, u := range webhookUrls {
+		for i := 0; i < maxWebhookTries; i++ {
+			reader := bytes.NewBuffer(buffer)
+			resp, err := httpClient.Post(u.String(), "application/json", reader)
 			if err != nil {
 				log.Printf("notifyChanges: httpClient.Post error %s\n", err)
 				time.Sleep(5 * time.Second)
 				continue
 			}
-			defer resp.Body.Close()
+			_ = resp.Body.Close()
+			break
 		}
 	}
 }
