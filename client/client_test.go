@@ -4,10 +4,6 @@ import (
 	"testing"
 )
 
-func TestRegister(t *testing.T) {
-
-}
-
 func TestGetLocalIP(t *testing.T) {
 	want := "192.168.0.10"
 	got, err := GetLocalIP()

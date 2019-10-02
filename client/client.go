@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	servicemanager "github.com/crossworth/service-manager"
 	"github.com/pkg/errors"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -117,8 +119,37 @@ func notifyServiceManager(options Options) {
 	_ = response.Body.Close()
 }
 
+func isDocker() bool {
+	var dockerEnv bool
+	var dockerCGroup bool
+
+	if _, err := os.Stat("/.dockerenv"); err == nil {
+		dockerEnv = true
+	}
+
+	if data, err := ioutil.ReadFile("/proc/self/cgroup"); err == nil {
+		dockerCGroup = strings.Contains(string(data), "docker")
+	}
+
+	return dockerEnv || dockerCGroup
+}
+
 // GetLocalIP returns the preferred outbound ip address
 func GetLocalIP() (string, error) {
+	if isDocker() {
+		hostname, err := os.Hostname()
+		if err != nil {
+			return "", err
+		}
+
+		ip, err := net.ResolveIPAddr("ip4", hostname)
+		if err != nil {
+			return "", err
+		}
+
+		return ip.String(), nil
+	}
+
 	// source: https://stackoverflow.com/a/37382208
 	conn, err := net.Dial("udp", "1.1.1.1:80")
 	if err != nil {
