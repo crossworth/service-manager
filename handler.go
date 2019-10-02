@@ -27,6 +27,7 @@ func newHTTPResponseOK() httpResponseOK {
 
 func writeJson(w http.ResponseWriter, data interface{}, status int) {
 	w.WriteHeader(status)
+	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(data)
 }
 
